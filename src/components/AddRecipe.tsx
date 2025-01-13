@@ -130,8 +130,7 @@ const AddRecipeForm: React.FC = () => {
           ))}
         </select>
       </div>
-      <div>
-        <label>Imagen URL:</label>        
+      <div>    
         <label>Imagen de portada:</label>
         <input
           type="file"
