@@ -6,21 +6,27 @@ import LoginPage from './pages/LoginPage';
 import RecipePage from './pages/RecipePage';
 import Layout from './layouts/Layout';
 import RecipeDetailPage from './pages/RecipeDetailPage';
-
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './theme';
 const App: React.FC = () => {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/add-recipe" element={<AddRecipePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/recipe" element={<RecipePage />} />
-          <Route path="/recipe/:id" element={<RecipeDetailPage />} />
-
-        </Routes>
-      </Layout>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/add-recipe" element={<AddRecipePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/recipe" element={<RecipePage />} />
+              <Route path="/recipe/:id" element={<RecipeDetailPage />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </CssBaseline>
+    </ThemeProvider>
+    
   );
 };
 

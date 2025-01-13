@@ -1,48 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabase/supabaseCliente'
-import Logout from '../components/Logout';
+import React from 'react';
+import { Box, Container, Typography, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 const HomePage: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
-  useEffect(() => {
-      const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-
-    fetchUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    // Desuscribir correctamente
-    return () => {
-      authListener.subscription.unsubscribe(); // Aquí es donde corregimos
-    };
-  }, []);
-
-  const navigate = useNavigate();
-
+//'url(/src/imgs/ingre.webp)'
   return (
     <div>
-      <h1>Bienvenido a la página principal</h1>
-      {user ? (
-        <div>
-          <h2>Bienvenido {user.email}</h2>
-          <button onClick={() => navigate('/add-recipe')}>Agregar Receta</button>
-          <button onClick={() => navigate('/recipe')}>Ver Recetas</button>
-          <Logout />
-        </div>
-      ) : (
-        <div>
-          <h2>Bienvenido a la aplicación</h2>
-          <button onClick={() => navigate('/register')}>Registrarse</button>
-          <button onClick={() => navigate('/login')}>Iniciar sesión</button>
-        </div>
-      )}
+      <Box
+  sx={{
+    backgroundImage: 'url(/src/imgs/ingre.webp)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    color: 'white',
+    padding: '200px 0',
+    position: 'relative',
+  }}
+>
+  {/* Fondo oscuro translúcido */}
+  <Box
+    sx={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro con opacidad
+    }}
+  />
+  <Container sx={{ position: 'relative', zIndex: 1 }}>
+      <Typography variant="h3" gutterBottom>
+        ¡Bienvenido a Mi Recetario!
+      </Typography>
+      <Typography variant="h6" paragraph>
+        Explora nuestras deliciosas recetas y empieza a cocinar platos increíbles.
+      </Typography>
+      <Button component={Link} to="/recipes" variant="contained" color="secondary">
+        Ver Recetas
+      </Button>
+    </Container>
+  </Box>
+
       
     </div>
   );

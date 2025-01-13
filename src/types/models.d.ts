@@ -6,13 +6,14 @@ export interface User {
   }
   
 export interface Recipe {
-id?: string;
-userId: number;
-description: string;
-ingredients: string;
-instructions: string;
-category: string;
-imageUrl: string;
-createdAt?: Date;
+  id: string;          
+  user_id: string;     
+  title: string;
+  description: string;
+  ingredients: string;
+  instructions: string;  
+  image_url: string;   
+  created_at: string;  
+  category_id: string; 
 }
   

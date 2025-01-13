@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabase/supabaseCliente'; // Asegúrate de importar tu cliente de Supabase
+import { supabase } from '../supabase/supabaseCliente';
 import { useNavigate } from 'react-router-dom';
 import { uploadRecipeImage } from '../utils/uploadImage';
+
 const AddRecipeForm: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
   const [instructions, setInstructions] = useState('');
   const [category, setCategory] = useState('');
-  //const [imageUrl, setImageUrl] = useState('');
   const [user, setUser] = useState<any>(null);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]); // Estado para las categorías
-  const navigate = useNavigate();
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  // Obtener el usuario autenticado y las categorías
+  const [loading, setLoading] = useState<boolean>(false); // Estado para el loading
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserAndCategories = async () => {
-      // Obtener el usuario
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-      // Obtener las categorías desde la base de datos
       const { data, error } = await supabase.from('categories').select('id, name');
-      console.log(data)
       if (error) {
         console.error('Error al obtener categorías:', error.message);
       } else {
@@ -37,7 +35,6 @@ const AddRecipeForm: React.FC = () => {
       }
     );
 
-    // Desuscribir correctamente
     return () => {
       authListener.subscription.unsubscribe();
     };
@@ -50,33 +47,43 @@ const AddRecipeForm: React.FC = () => {
       alert('Debes loguearte para agregar recetas');
       return;
     }
+
     if (!imageFile) {
       console.error('Por favor selecciona una imagen');
       return;
     }
 
-    // Sube la imagen y obtén la URL pública
-    const imageUrl = await uploadRecipeImage(imageFile, title);
+    setLoading(true); // Inicia el loading
+    const sanitizedTitle = title
+      .normalize('NFD') 
+      .replace(/[\u0300-\u036f]/g, '');
+    try {
+      const imageUrl = await uploadRecipeImage(imageFile, sanitizedTitle);
 
-    if (!imageUrl) {
-      console.error('Error al subir la imagen');
-      return;
-    }
+      if (!imageUrl) {
+        throw new Error('Error al subir la imagen');
+      }
+      const { error } = await supabase.from('recipes').insert([
+        {
+          title,
+          description,
+          ingredients,
+          instructions,
+          category_id: category,
+          image_url: imageUrl,
+          user_id: user.id,
+        },
+      ]);
 
-    const { error } = await supabase.from('recipes').insert([{
-      title,
-      description,
-      ingredients,
-      instructions,
-      category,
-      image_url: imageUrl,
-      user_id: user.id, // El ID del usuario para asociar la receta con el usuario
-    }]);
-    navigate('/recipe');
-    if (error) {
-      console.error('Error al agregar receta:', error.message);
-    } else {
-      console.log('Receta agregada con éxito');
+      if (error) {
+        throw new Error(`Error al agregar receta: ${error.message}`);
+      }
+      navigate('/recipe');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false); // Finaliza el loading
+      navigate('/recipe');
     }
   };
 
@@ -122,7 +129,7 @@ const AddRecipeForm: React.FC = () => {
           onChange={(e) => setCategory(e.target.value)}
           required
         >
-          {/* Cargar las categorías dinámicamente desde la base de datos */}
+          <option value="">Selecciona una categoría</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
@@ -130,7 +137,7 @@ const AddRecipeForm: React.FC = () => {
           ))}
         </select>
       </div>
-      <div>    
+      <div>
         <label>Imagen de portada:</label>
         <input
           type="file"
@@ -139,7 +146,9 @@ const AddRecipeForm: React.FC = () => {
           required
         />
       </div>
-      <button type="submit">Agregar Receta</button>
+      <button type="submit" disabled={loading}>
+        {loading ? 'Agregando receta...' : 'Agregar Receta'}
+      </button>
     </form>
   );
 };

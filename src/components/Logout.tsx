@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { logout } from '../services/authService';
+import Button from '@mui/material/Button';
 
 const Logout = () => {
   const handleLogout = async () => {
@@ -13,7 +14,7 @@ const Logout = () => {
     }
   };
 
-  return <button onClick={handleLogout}>Cerrar sesión</button>;
+  return <Button variant="contained" onClick={handleLogout}>Cerrar sesión</Button>;
 };
 
 export default Logout;
