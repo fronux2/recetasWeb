@@ -5,6 +5,7 @@ import AddRecipePage from './pages/AddRecipePage';
 import LoginPage from './pages/LoginPage';
 import RecipePage from './pages/RecipePage';
 import Layout from './layouts/Layout';
+import RecipeDetailPage from './pages/RecipeDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,8 @@ const App: React.FC = () => {
           <Route path="/add-recipe" element={<AddRecipePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/recipe" element={<RecipePage />} />
+          <Route path="/recipe/:id" element={<RecipeDetailPage />} />
+
         </Routes>
       </Layout>
     </Router>
