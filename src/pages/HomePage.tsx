@@ -1,44 +1,56 @@
 import React from 'react';
-import { Box, Container, Typography, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import Hero from '../components/Hero';
+import MiniCarousel from '../components/MiniCarousel';
+import MiniCarousel2 from '../components/MiniCarousel2';
+import { Button, Container, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
 //'url(/src/imgs/ingre.webp)'
   return (
     <div>
-      <Box
-  sx={{
-    backgroundImage: 'url(/src/imgs/ingre.webp)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    color: 'white',
-    padding: '200px 0',
-    position: 'relative',
-  }}
->
-  {/* Fondo oscuro translúcido */}
-  <Box
-    sx={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro con opacidad
-    }}
-  />
-  <Container sx={{ position: 'relative', zIndex: 1 }}>
-      <Typography variant="h3" gutterBottom>
-        ¡Bienvenido a Mi Recetario!
-      </Typography>
-      <Typography variant="h6" paragraph>
-        Explora nuestras deliciosas recetas y empieza a cocinar platos increíbles.
-      </Typography>
-      <Button component={Link} to="/recipes" variant="contained" color="secondary">
-        Ver Recetas
+      <Hero />
+      <Container sx={{ marginTop: '50px', marginBottom: '50px' }}>
+        <Typography variant="h4">
+          Recetas del día.
+        </Typography>        
+      </Container>
+      <MiniCarousel/>
+      <Container>
+        <Typography  sx={{ marginTop: '50px', marginBottom: '50px' }} variant="h4">
+          Almuerzo
+        </Typography>        
+      </Container>
+      <MiniCarousel2/>
+      <Container sx={{ marginTop: '50px', marginBottom: '50px' }}>
+        <Typography variant="h4">
+          Postres
+        </Typography>        
+      </Container>
+      <MiniCarousel2/>
+      <Container sx={{ marginTop: '50px', marginBottom: '50px' }}>
+        <Typography variant="h4">
+          Bebidas
+        </Typography>        
+      </Container>    
+      <MiniCarousel2/>
+    
+      <Box sx={{ textAlign: 'center', margin: '40px 0' }}>
+      <Button
+        variant="contained"
+        size="large"
+        sx={{                   
+          padding: '12px 24px',
+          fontSize: '18px'
+        }}
+        onClick={() => {
+          navigate('/recipe');
+        }}
+      >
+        Mirar Más Recetas
       </Button>
-    </Container>
-  </Box>
-
+    </Box>
+      
       
     </div>
   );

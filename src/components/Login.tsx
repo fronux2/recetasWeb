@@ -1,9 +1,17 @@
-// src/components/Login.tsx
-
 import React, { useState } from 'react';
-import { login } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
-const Login = () => {
+import {
+  Box,
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Stack,
+} from '@mui/material';
+import { login } from '../services/authService';
+
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,44 +20,60 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const logeado =await login(email, password);
-      if(logeado){
+      const loggedIn = await login(email, password);
+      if (loggedIn) {
         navigate('/');
       }
-      // Aquí puedes redirigir a la página principal después de un login exitoso
-    } catch (error) {
-      setErrorMessage(error.message);
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Error al iniciar sesión.');
     }
   };
 
   return (
-    <div>
-      <h2>Iniciar sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="emailLogin">Correo electrónico</label>
-          <input
-            type="email"
+    <Container maxWidth="sm" sx={{ mt: 8 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{
+          p: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Iniciar sesión
+        </Typography>
+        <Stack spacing={3}>
+          <TextField
             id="emailLogin"
+            label="Correo electrónico"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            fullWidth
             required
           />
-        </div>
-        <div>
-          <label htmlFor="passwordLogin">Contraseña</label>
-          <input
-            type="password"
+          <TextField
             id="passwordLogin"
+            label="Contraseña"
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            fullWidth
             required
           />
-        </div>
-        <button type="submit">Iniciar sesión</button>
-        {errorMessage && <p>{errorMessage}</p>}
-      </form>
-    </div>
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Iniciar sesión
+          </Button>
+        </Stack>
+        {errorMessage && (
+          <Box mt={2}>
+            <Alert severity="error">{errorMessage}</Alert>
+          </Box>
+        )}
+      </Box>
+    </Container>
   );
 };
 

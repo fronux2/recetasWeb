@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../supabase/supabaseCliente';
-import { Recipe } from '../types/models';
+import { Button, Box, Typography } from '@mui/material';
 
 const RecipeDetailPage: React.FC = () => {
-  const { id } = useParams();
+  const { id } = useParams();  // Aquí accedes al id desde la URL
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -17,38 +19,95 @@ const RecipeDetailPage: React.FC = () => {
         .select(`*, categories(name)`)
         .eq('id', id)
         .single();
-      console.log(data);
       if (error) {
         setError('No se pudo cargar la receta.');
-        console.error(error);
       } else {
         setRecipe(data);
       }
       setLoading(false);
     };
 
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
     fetchRecipe();
+    fetchUser();
   }, [id]);
 
-  if (loading) return <p>Cargando detalles de la receta...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  const handleFavorite = async () => {
+    if (!user) {
+      alert('Necesitas estar logueado para guardar en favoritos');
+      return;
+    }
+
+    // Agregar o eliminar de favoritos
+    const { data, error } = await supabase
+      .from('favorites')
+      .upsert([{ user_id: user.id, recipe_id: recipe?.id }]);
+
+    if (error) {
+      console.error('Error al guardar en favoritos:', error.message);
+    } else {
+      setIsFavorite(true);
+    }
+  };
+
+  if (loading) return <Typography>Cargando detalles de la receta...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <div className="bg-gray-100 p-6 rounded-lg">
-      <p className="text-gray-700 mt-4">{recipe?.description}</p>
-      <h2 className="text-2xl font-semibold mt-6">Ingredientes:</h2>
-      <p>{recipe?.ingredients}</p>
-      <h2 className="text-2xl font-semibold mt-6">Instrucciones:</h2>
-      <p>{recipe?.instructions}</p>
-      <h2 className="text-2xl font-semibold mt-6">Categoría:</h2>
-      <p>{recipe?.categories?.name}</p>
-      <h2 className="text-2xl font-semibold mt-6">Imagen:</h2>
-      <img src={recipe?.image_url} alt="Imagen de la receta" className="w-full" />
-      <h2 className="text-2xl font-semibold mt-6">Etiquetas:</h2>
-      <ul className="list-disc ml-6 mt-2 text-gray-600">
-        
-      </ul>
-    </div>
+    <Box sx={{ backgroundColor: 'background.paper', p: 4, borderRadius: 2, maxWidth: 'lg', margin: 'auto' }}>
+      <Box 
+        component="img" 
+        src={recipe?.image_url} 
+        alt="Imagen de la receta"
+        sx={{
+          width: '100%',
+          maxHeight: 400,
+          objectFit: 'contain',
+          borderRadius: 2,
+          marginBottom: 3,
+        }}
+      />
+      <Typography variant="h4" gutterBottom>
+        {recipe?.title}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        {recipe?.description}
+      </Typography>
+      <Typography variant="h6" paragraph>
+        Ingredientes:
+      </Typography>
+      <Typography variant="body2" paragraph>
+        {recipe?.ingredients}
+      </Typography>
+      <Typography variant="h6" paragraph>
+        Instrucciones:
+      </Typography>
+      <Typography variant="body2" paragraph>
+        {recipe?.instructions}
+      </Typography>
+      <Typography variant="h6" paragraph>
+        Categoría:
+      </Typography>
+      <Typography variant="body2" paragraph>
+        {recipe?.categories?.name}
+      </Typography>
+
+      {user && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleFavorite}
+          disabled={isFavorite}
+          sx={{ mt: 3 }}
+        >
+          {isFavorite ? 'Receta Guardada' : 'Guardar en Favoritos'}
+        </Button>
+      )}
+    </Box>
   );
 };
 

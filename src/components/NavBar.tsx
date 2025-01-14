@@ -51,10 +51,10 @@ const NavBar: React.FC = () => {
             Home
           </Button>
           <Button component={Link} to="/add-recipe" color="inherit">
-            Add Recipe
+            Agregar Receta.
           </Button>
           <Button component={Link} to="/recipe" color="inherit">
-            Recipes
+            Recetas
           </Button>
           {user ? (
               <div>                
